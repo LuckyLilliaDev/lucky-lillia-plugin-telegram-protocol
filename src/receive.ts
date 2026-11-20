@@ -6,13 +6,37 @@ import { ALLOWED_UPDATES, type Update, type WebhookInfo } from './types.js'
 
 type Logger = ReturnType<Context['logger']>
 
-/** Hands updates to the bot one after another, so plugins see messages in order */
+/** Messages older than this when the plugin started are not handled: no answering stale commands */
+export const STALE_AFTER = 5 * 60
+
+/** When it happened, in seconds; undefined for updates that stay valid (join requests, button clicks) */
+function dateOf(update: Update): number | undefined {
+  const message = update.message ?? update.channel_post
+  if (message) return message.date
+  const edited = update.edited_message ?? update.edited_channel_post
+  if (edited) return edited.edit_date ?? edited.date
+  return update.my_chat_member?.date ?? update.message_reaction?.date
+}
+
+/**
+ * Hands updates to the bot one after another, so plugins see messages in order. What waited for the bot while it
+ * was away is handled, except messages from more than STALE_AFTER before it started.
+ */
 export class UpdateQueue {
   private tail: Promise<void> = Promise.resolve()
+  private readonly since: number
+  private skipped = 0
 
-  constructor(private readonly bot: TelegramBot, private readonly logger: Logger) {}
+  constructor(private readonly bot: TelegramBot, private readonly logger: Logger, startedAt = Date.now()) {
+    this.since = Math.floor(startedAt / 1000) - STALE_AFTER
+  }
 
   push(update: Update) {
+    const date = dateOf(update)
+    if (date !== undefined && date < this.since) {
+      if (!this.skipped++) this.logger.info('跳过机器人离线期间超过 %d 分钟的旧消息', STALE_AFTER / 60)
+      return
+    }
     this.tail = this.tail.then(() => this.bot.handle(update)).catch((e) => {
       this.logger.warn('处理更新 %d 失败: %s', update.update_id, (e as Error).message)
     })
@@ -28,10 +52,7 @@ function backoff(failures: number) {
   return Math.min(30_000, 1000 * 2 ** Math.min(failures - 1, 5))
 }
 
-/**
- * Long polling with getUpdates until `signal` aborts. What piled up while the bot was away is skipped, so it does
- * not answer stale commands.
- */
+/** Long polling with getUpdates until `signal` aborts; the queue leaves out stale messages. */
 export async function poll(bot: TelegramBot, api: TelegramApi, queue: UpdateQueue, timeout: number, signal: AbortSignal, logger: Logger) {
   let offset: number | undefined
   let failures = 0
@@ -44,8 +65,7 @@ export async function poll(bot: TelegramBot, api: TelegramApi, queue: UpdateQueu
           logger.info('已移除之前设置的 Webhook，改用长轮询')
           await api.call('deleteWebhook', {}, signal)
         }
-        const pending = await api.call<Update[]>('getUpdates', { offset: -1, timeout: 0 }, signal)
-        offset = pending.length ? pending[pending.length - 1].update_id + 1 : 0
+        offset = 0
       }
       const updates = await api.call<Update[]>('getUpdates', { offset, timeout, allowed_updates: ALLOWED_UPDATES }, signal)
       if (failures) logger.info('已重新连上 Telegram')

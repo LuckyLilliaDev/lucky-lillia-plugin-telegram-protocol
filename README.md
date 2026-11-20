@@ -24,7 +24,7 @@ Telegram 机器人默认开着隐私模式，在群里只能收到 `/指令`、@
 | 长轮询（默认） | 主动向 Telegram 拉取，不需要公网地址 |
 | Webhook | Telegram 推送到 `<公网地址>/telegram/webhook/<机器人 ID>`。需要 HTTPS 公网地址反向代理到 WebUI；请求用 `X-Telegram-Bot-Api-Secret-Token` 校验 |
 
-切回长轮询时会自动删除之前设置的 Webhook。启动时跳过机器人离线期间积压的更新，避免回复过时的指令。
+切回长轮询时会自动删除之前设置的 Webhook。机器人离线期间积压的消息会补处理，但发出超过 5 分钟的旧消息会跳过，避免回复过时的指令；入群申请和按钮点击不受影响。
 
 ## ID 约定
 
@@ -78,6 +78,12 @@ await tg?.pinChatMessage({ chat_id: session.guildId, message_id: Number(session.
 npm install
 npm test        # 用本地模拟的 Bot API 测试，不需要真实 Token
 npm run build
+```
+
+连真实 Telegram 测试（默认跳过）。`TG_TOKEN` 为真实机器人的 Token；再给 `TG_CHAT`（先私聊机器人发 /start，填自己的用户 ID）会发一条测试消息并随即删除：
+
+```sh
+NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://127.0.0.1:7890 TG_LIVE=1 TG_TOKEN=... TG_CHAT=... npx vitest run test/live.test.ts
 ```
 
 ## 致谢

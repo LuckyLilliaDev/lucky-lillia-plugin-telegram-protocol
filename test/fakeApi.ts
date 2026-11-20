@@ -16,6 +16,8 @@ export interface ApiCall {
  */
 export class FakeApi {
   calls: ApiCall[] = []
+  /** getUpdates requests so far */
+  polls = 0
   handlers: Record<string, (body: Record<string, any>) => unknown> = {}
   files: Record<string, Buffer> = {}
   private updates: any[] = []
@@ -44,14 +46,16 @@ export class FakeApi {
       }
       const method = url.pathname.slice(prefix.length)
       const body = await parseBody(raw, String(req.headers['content-type'] ?? ''))
-      if (method !== 'getUpdates') this.calls.push({ method, body })
+      if (method === 'getUpdates') this.polls++
+      else this.calls.push({ method, body })
       let result: unknown
       try {
         result = await this.answer(method, body)
       } catch (e) {
-        const { code, description } = e as { code: number; description: string }
+        const { code, description, retryAfter } = e as { code: number; description: string; retryAfter?: number }
         res.writeHead(code, { 'content-type': 'application/json' })
-        return res.end(JSON.stringify({ ok: false, error_code: code, description }))
+        const parameters = retryAfter === undefined ? undefined : { retry_after: retryAfter }
+        return res.end(JSON.stringify({ ok: false, error_code: code, description, parameters }))
       }
       res.writeHead(200, { 'content-type': 'application/json' })
       res.end(JSON.stringify({ ok: true, result }))

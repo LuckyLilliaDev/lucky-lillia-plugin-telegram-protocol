@@ -371,18 +371,68 @@ function captionable(batch: Media[]) {
   return batch.length > 1 || (batch[0].kind !== 'sticker' && batch[0].kind !== 'video_note')
 }
 
-/** Long text in pieces Telegram takes, cut at line ends where it can be */
-export function splitText(text: string, limit = TEXT_LIMIT): string[] {
-  if (text.length <= limit) return [text]
+interface OpenTag {
+  name: string
+  /** As written, attributes and all, to open it again in the next piece */
+  tag: string
+}
+
+const closing = (stack: OpenTag[]) => stack.slice().reverse().map(t => `</${t.name}>`).join('')
+const opening = (stack: OpenTag[]) => stack.map(t => t.tag).join('')
+const hasText = (html: string) => html.replace(/<[^>]*>/g, '').trim() !== ''
+
+/**
+ * Telegram HTML in pieces of at most `limit`, cut at line ends where it can be and never inside a tag or an
+ * entity; a tag open at a cut is closed there and opened again at the start of the next piece.
+ */
+export function splitText(html: string, limit = TEXT_LIMIT): string[] {
+  if (html.length <= limit) return [html]
+  const tokens = html.match(/<[^>]*>|&#?\w+;|[\s\S]/g) ?? []
   const chunks: string[] = []
-  let rest = text
-  while (rest.length > limit) {
-    let cut = rest.lastIndexOf('\n', limit)
-    if (cut <= 0) cut = limit
-    chunks.push(rest.slice(0, cut))
-    rest = rest.slice(cut).replace(/^\n/, '')
+  let stack: OpenTag[] = []
+  let current = ''
+  /** Length of the tags opened again at the start of `current` */
+  let prefix = 0
+  /** Where `current` may be cut after a line end, and the tags open there */
+  let lineEnd = -1
+  let lineStack: OpenTag[] = []
+
+  const emit = (piece: string) => {
+    if (hasText(piece)) chunks.push(piece)
   }
-  if (rest) chunks.push(rest)
+
+  for (const token of tokens) {
+    let next = stack
+    const close = /^<\/([\w-]+)/.exec(token)
+    const open = !close && /^<([\w-]+)/.exec(token)
+    if (close) {
+      const at = stack.map(t => t.name).lastIndexOf(close[1].toLowerCase())
+      if (at >= 0) next = stack.slice(0, at)
+    } else if (open) {
+      next = [...stack, { name: open[1].toLowerCase(), tag: token }]
+    }
+
+    if (current.length + token.length + closing(next).length > limit && current.length > prefix) {
+      if (lineEnd > prefix) {
+        // Cut at the line end; the line break itself goes
+        emit(current.slice(0, lineEnd) + closing(lineStack))
+        current = opening(lineStack) + current.slice(lineEnd + 1)
+        prefix = opening(lineStack).length
+      } else {
+        emit(current + closing(stack))
+        current = opening(stack)
+        prefix = current.length
+      }
+      lineEnd = -1
+    }
+    if (token === '\n') {
+      lineEnd = current.length
+      lineStack = stack
+    }
+    current += token
+    stack = next
+  }
+  emit(current)
   return chunks
 }
 

@@ -14,7 +14,7 @@ const alice = { id: 42, is_bot: false, first_name: 'Alice', last_name: 'Liddell'
 const group = { id: -100123, type: 'supergroup' as const, title: '测试群' }
 
 function message(fields: Partial<Message>): Message {
-  return { message_id: 7, date: 1_700_000_000, chat: { id: 42, type: 'private', first_name: 'Alice' }, from: alice, ...fields }
+  return { message_id: 7, date: Math.floor(Date.now() / 1000), chat: { id: 42, type: 'private', first_name: 'Alice' }, from: alice, ...fields }
 }
 
 describe('decoding', () => {
