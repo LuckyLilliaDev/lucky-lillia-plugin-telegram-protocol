@@ -66,7 +66,7 @@ Telegram 没有的能力（读历史消息、好友列表、机器人所在群�
 
 ```ts
 import { internalOf } from '@luckylillia/plugin-sdk'
-import type {} from '@luckylillia/plugin-telegram'
+import type {} from '@luckylillia/plugin-telegram-protocol'
 
 const tg = internalOf(session.bot, 'telegram')
 await tg?.pinChatMessage({ chat_id: session.guildId, message_id: Number(session.messageId) })

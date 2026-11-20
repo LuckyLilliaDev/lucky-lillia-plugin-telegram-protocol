@@ -1,5 +1,5 @@
 {
-  "name": "@luckylillia/plugin-telegram",
+  "name": "@luckylillia/plugin-telegram-protocol",
   "version": "0.1.0",
   "description": "Telegram Bot API 协议：用 Bot Token 接入 Telegram，插件可在其上收发消息",
   "author": "LuckyLilliaDev",
@@ -58,7 +58,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LuckyLilliaDev/lucky-lillia-plugin-telegram.git"
+    "url": "git+https://github.com/LuckyLilliaDev/lucky-lillia-plugin-telegram-protocol.git"
   },
   "publishConfig": {
     "access": "public",
