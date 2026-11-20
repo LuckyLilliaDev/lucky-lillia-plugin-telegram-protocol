@@ -1,0 +1,67 @@
+{
+  "name": "@luckylillia/plugin-telegram",
+  "version": "0.1.0",
+  "description": "Telegram Bot API 协议：用 Bot Token 接入 Telegram，插件可在其上收发消息",
+  "author": "LuckyLilliaDev",
+  "type": "module",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "assets",
+    "licenses",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "luckylillia-plugin",
+    "telegram",
+    "protocol"
+  ],
+  "scripts": {
+    "build": "tsc -p .",
+    "dev": "tsc -p . --watch",
+    "check": "tsc -p . --noEmit",
+    "test": "vitest run",
+    "prepack": "npm run build"
+  },
+  "peerDependencies": {
+    "@luckylillia/plugin-sdk": "^1.0.1"
+  },
+  "devDependencies": {
+    "@cordisjs/plugin-timer": "^1.1.4",
+    "@luckylillia/plugin-sdk": "^1.0.1",
+    "@satorijs/element": "^3.2.0",
+    "@satorijs/protocol": "^1.7.0",
+    "@types/node": "^24.19.2",
+    "cordis": "4.0.0-rc.11",
+    "schemastery": "^3.18.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  },
+  "llbot": {
+    "title": "Telegram",
+    "category": "protocol",
+    "icon": "assets/icon.svg",
+    "description": "用 Bot Token 接入 Telegram 机器人，插件和 Satori 客户端可以在 Telegram 的私聊、群组、话题和频道里收发消息",
+    "service": {
+      "required": [
+        "bots",
+        "http",
+        "webuiServer"
+      ]
+    }
+  },
+  "license": "GPL-2.0",
+  "types": "lib/index.d.ts",
+  "engines": {
+    "node": ">=22.15"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuckyLilliaDev/lucky-lillia-plugin-telegram.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
+}
