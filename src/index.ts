@@ -1,4 +1,4 @@
-import type { Context } from '@luckylillia/plugin-sdk'
+import type { Context } from '@luckylillia-dev/plugin-sdk'
 import { sleep, TelegramApi, TelegramError } from './api.js'
 import { Status, TelegramBot, type TelegramInternal } from './bot.js'
 import { Config, TOKEN_PATTERN } from './config.js'
@@ -12,7 +12,7 @@ export type * as Telegram from './types.js'
 export const name = 'telegram'
 export const inject = ['bots', 'http', 'webuiServer']
 
-declare module '@luckylillia/plugin-sdk' {
+declare module '@luckylillia-dev/plugin-sdk' {
   interface PlatformInternals {
     telegram: TelegramInternal
   }

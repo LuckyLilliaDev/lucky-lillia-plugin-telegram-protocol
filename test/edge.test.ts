@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { h, type Bot, type Session, type WebUIServer } from '@luckylillia/plugin-sdk'
-import { createTestApp, type TestApp } from '@luckylillia/plugin-sdk/testing'
+import { h, type Bot, type Session, type WebUIServer } from '@luckylillia-dev/plugin-sdk'
+import { createTestApp, type TestApp } from '@luckylillia-dev/plugin-sdk/testing'
 import * as plugin from '../src/index.js'
 import { TelegramApi, TelegramError } from '../src/api.js'
 import { splitText } from '../src/encode.js'

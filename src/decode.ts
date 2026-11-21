@@ -1,5 +1,5 @@
-import { h } from '@luckylillia/plugin-sdk'
-import type { NeutralEvent, NeutralResource, NeutralUser } from '@luckylillia/plugin-sdk'
+import { h } from '@luckylillia-dev/plugin-sdk'
+import type { NeutralEvent, NeutralResource, NeutralUser } from '@luckylillia-dev/plugin-sdk'
 import type { MediaKind } from './encode.js'
 import { channelOf, fullName, privateChannel } from './ids.js'
 import type { MediaStore } from './media.js'

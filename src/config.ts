@@ -1,4 +1,4 @@
-import { Schema } from '@luckylillia/plugin-sdk'
+import { Schema } from '@luckylillia-dev/plugin-sdk'
 
 export interface PollingConfig {
   protocol: 'polling'

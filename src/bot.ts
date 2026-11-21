@@ -1,7 +1,7 @@
-import { h } from '@luckylillia/plugin-sdk'
+import { h } from '@luckylillia-dev/plugin-sdk'
 import type {
   Bot, Context, Feature, Http, NeutralEvent, NeutralList, NeutralResource, SendOptions, Universal,
-} from '@luckylillia/plugin-sdk'
+} from '@luckylillia-dev/plugin-sdk'
 import type { TelegramApi } from './api.js'
 import { CommandButtons } from './buttons.js'
 import {

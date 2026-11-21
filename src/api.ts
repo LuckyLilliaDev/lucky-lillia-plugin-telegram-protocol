@@ -1,4 +1,4 @@
-import type { Http, HttpFile } from '@luckylillia/plugin-sdk'
+import type { Http, HttpFile } from '@luckylillia-dev/plugin-sdk'
 import type { File } from './types.js'
 
 /** What the Bot API answered with `ok: false` */

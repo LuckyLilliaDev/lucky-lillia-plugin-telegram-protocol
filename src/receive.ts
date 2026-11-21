@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import type { Context } from '@luckylillia/plugin-sdk'
+import type { Context } from '@luckylillia-dev/plugin-sdk'
 import { sleep, TelegramError, type TelegramApi } from './api.js'
 import { Status, type TelegramBot } from './bot.js'
 import { ALLOWED_UPDATES, type Update, type WebhookInfo } from './types.js'

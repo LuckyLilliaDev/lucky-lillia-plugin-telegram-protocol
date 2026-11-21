@@ -1,5 +1,5 @@
 {
-  "name": "@luckylillia/plugin-telegram-protocol",
+  "name": "@luckylillia-dev/plugin-telegram-protocol",
   "version": "0.1.0",
   "description": "Telegram Bot API 协议：用 Bot Token 接入 Telegram，插件可在其上收发消息",
   "author": "LuckyLilliaDev",
@@ -25,11 +25,11 @@
     "prepack": "npm run build"
   },
   "peerDependencies": {
-    "@luckylillia/plugin-sdk": "^1.0.1"
+    "@luckylillia-dev/plugin-sdk": "^1.0.1"
   },
   "devDependencies": {
     "@cordisjs/plugin-timer": "^1.1.4",
-    "@luckylillia/plugin-sdk": "^1.0.1",
+    "@luckylillia-dev/plugin-sdk": "npm:@luckylillia/plugin-sdk@^1.0.1",
     "@satorijs/element": "^3.2.0",
     "@satorijs/protocol": "^1.7.0",
     "@types/node": "^24.19.2",
