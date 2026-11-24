@@ -1,9 +1,10 @@
 import type { Context } from '@luckylillia-dev/plugin-sdk'
 import { sleep, TelegramApi, TelegramError } from './api.js'
 import { Status, TelegramBot, type TelegramInternal } from './bot.js'
-import { Config, TOKEN_PATTERN } from './config.js'
+import { Config, DEFAULT_ENDPOINT, TOKEN_PATTERN } from './config.js'
 import { MediaStore } from './media.js'
 import { poll, UpdateQueue, webhook, webhookSecret } from './receive.js'
+import { registerTestRoute } from './testRoute.js'
 
 export { Config }
 export { TelegramBot, TelegramError, type TelegramInternal }
@@ -18,7 +19,6 @@ declare module '@luckylillia-dev/plugin-sdk' {
   }
 }
 
-const DEFAULT_ENDPOINT = 'https://api.telegram.org'
 /** Long enough for an upload; long polls end well before */
 const HTTP_TIMEOUT = 120_000
 const LOGIN_TIMEOUT = 20_000
@@ -27,6 +27,7 @@ const CLEANUP_INTERVAL = 12 * 60 * 60 * 1000
 /** One Telegram bot per entry, by its token; add another entry for another bot. */
 export async function apply(ctx: Context, config: Config) {
   const logger = ctx.logger('telegram')
+  registerTestRoute(ctx, () => config)
   const token = config.token.trim()
   // Waits for its settings instead of failing: saving them starts it
   if (!token) {
@@ -35,12 +36,8 @@ export async function apply(ctx: Context, config: Config) {
   }
   if (!TOKEN_PATTERN.test(token)) throw new Error('Bot Token 格式不对，应形如 123456789:AAxxxx（从 @BotFather 获得）')
 
-  const proxy = config.proxy.trim()
-  const http = ctx.http.extend({
-    timeout: HTTP_TIMEOUT,
-    // Left out, the「代理」entry decides
-    ...proxy ? { proxyAgent: proxy === 'direct' ? '' : proxy } : {},
-  })
+  // Automatically uses the builtin「代理」plugin when enabled
+  const http = ctx.http.extend({ timeout: HTTP_TIMEOUT })
   const api = new TelegramApi(http, { token, endpoint: config.endpoint.trim() || DEFAULT_ENDPOINT })
   const sid = `telegram:${token.split(':')[0]}`
   const media = config.mediaMaxSize > 0
@@ -54,7 +51,7 @@ export async function apply(ctx: Context, config: Config) {
     logger.info('Telegram 机器人 @%s (%s) 已登录', me.username ?? '', bot.selfId)
   } catch (e) {
     if (e instanceof TelegramError && (e.code === 401 || e.code === 404)) throw new Error('Bot Token 无效，请到 @BotFather 核对')
-    logger.warn('连接 Telegram 失败: %s，将在后台重试（国内网络需要设置代理）', (e as Error).message)
+    logger.warn('连接 Telegram 失败: %s，将在后台重试（国内网络请检查「代理」插件是否已启用）', (e as Error).message)
   }
 
   ctx.bots.register(bot)

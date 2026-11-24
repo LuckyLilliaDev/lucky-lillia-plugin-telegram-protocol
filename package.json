@@ -7,6 +7,7 @@
   "main": "lib/index.js",
   "files": [
     "lib",
+    "webui",
     "assets",
     "licenses",
     "README.md",
@@ -42,6 +43,7 @@
     "title": "Telegram",
     "category": "protocol",
     "icon": "assets/icon.svg",
+    "webui": "webui/index.js",
     "description": "用 Bot Token 接入 Telegram 机器人，插件和 Satori 客户端可以在 Telegram 的私聊、群组、话题和频道里收发消息",
     "service": {
       "required": [

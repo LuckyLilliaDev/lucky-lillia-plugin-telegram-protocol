@@ -10,6 +10,8 @@ export interface User {
   last_name?: string
   username?: string
   language_code?: string
+  can_join_groups?: boolean
+  can_read_all_group_messages?: boolean
 }
 
 export type ChatType = 'private' | 'group' | 'supergroup' | 'channel'
